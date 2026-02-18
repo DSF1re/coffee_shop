@@ -1,7 +1,5 @@
 <script setup lang="ts">
   import { RouterView } from 'vue-router'
-  import HeaderBar from '@/components/header.vue'
-  import Footer from '@/components/footer.vue'
 </script>
 
 <template>

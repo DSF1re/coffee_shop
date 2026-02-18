@@ -40,7 +40,7 @@ const handleLogin = async () => {
     router.push('/catalog'); 
     
   } catch (err) {
-    error.value = err.response?.data?.detail || `${err} Неверный логин или пароль`;
+    error.value = err.response?.data?.detail || `${response.data} Неверный логин или пароль`;
     console.error(err);
   } finally {
     loading.value = false;

@@ -72,6 +72,14 @@ def remove_employee(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
     return {"message": "Удалено"}
 
+@app.post("/api/product", response_model=schemas.ProductResponse, status_code=201)
+def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    try:
+        db_product = crud.create_product(db, product)
+        return db_product
+    except Exception as ex:
+        raise HTTPException(status_code=400, detail=f"Ошибка создания продукта: {str(ex)}")
+
 @app.get("/api/product", response_model=List[schemas.ProductResponse])
 def read_products(db: Session = Depends(get_db)):
     return crud.get_products(db)

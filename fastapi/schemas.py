@@ -59,6 +59,11 @@ class ProductResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class ProductCreate(BaseModel):
+    product_id: int
+    product_name: str
+    price: float
+
 class OrderResponse(BaseModel):
     order_id: int
     client_id: int
