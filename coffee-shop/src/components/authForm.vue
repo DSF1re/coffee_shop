@@ -5,17 +5,16 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const login = ref('');
+const email = ref('');
 const password = ref('');
-
 const loading = ref(false);
 const error = ref(null);
 
-const baseUrl = 'http://localhost:8000';
+const baseUrl = 'http://localhost:8080';
 
 const handleLogin = async () => {
-  if (!login.value || !password.value) {
-    error.value = 'Заполните все поля';
+  if (!email.value || !password.value) {
+    error.value = 'Заполните почту и пароль';
     return;
   }
 
@@ -23,24 +22,23 @@ const handleLogin = async () => {
   error.value = null;
   
   try {
-    const response = await axios.post(`${baseUrl}/api/user/login`, {
-      login: login.value,
+    const response = await axios.post(`${baseUrl}/auth/login`, {
+      email: email.value,
       password: password.value
     });
     
-    console.log('Успех:', response.data);
-    if (response.data) {
-      localStorage.setItem('userId', response.data.userId);
+    if (response.data.status === 'success') {
+      const userData = response.data.user;
+      
+      localStorage.setItem('userId', userData.id);
+      localStorage.setItem('userName', userData.name);
+      
+      console.log('Вход выполнен для:', userData.name);
+      router.push('/catalog'); 
     }
-    
-    if (response.data.token) {
-      localStorage.setItem('user_token', response.data.token);
-    }
-
-    router.push('/catalog'); 
     
   } catch (err) {
-    error.value = err.response?.data?.detail || `${response.data} Неверный логин или пароль`;
+    error.value = err.response?.data?.error || 'Ошибка подключения к серверу';
     console.error(err);
   } finally {
     loading.value = false;
@@ -51,26 +49,24 @@ const handleLogin = async () => {
 <template>
   <div class="auth-container">
     <form @submit.prevent="handleLogin" class="auth-card">
-      <h2>Авторизация</h2>
+      <h2>Кофейня: Вход</h2>
       
       <div class="input-group">
-        <label for="login">Логин</label>
+        <label>Email</label>
         <input 
-          id="login"
-          v-model="login" 
-          type="text" 
-          placeholder="Введите логин"
+          v-model="email" 
+          type="email" 
+          placeholder="example@mail.com"
           :disabled="loading"
         />
       </div>
 
       <div class="input-group">
-        <label for="password">Пароль</label>
+        <label>Пароль</label>
         <input 
-          id="password"
           v-model="password" 
           type="password" 
-          placeholder="Введите пароль"
+          placeholder="Ваш пароль"
           :disabled="loading"
         />
       </div>
@@ -78,109 +74,63 @@ const handleLogin = async () => {
       <p v-if="error" class="error-msg">{{ error }}</p>
 
       <button type="submit" :disabled="loading" class="login-btn">
-        <span v-if="loading">Вход...</span>
-        <span v-else>Войти</span>
+        {{ loading ? 'Проверка...' : 'Войти' }}
       </button>
 
       <div class="auth-footer">
-        <a href="#">Забыли пароль?</a>
-        <span>Нет аккаунта? <a href="#">Зарегистрироваться</a></span>
+        <span>Нет аккаунта? <router-link to="/register">Создать профиль</router-link></span>
       </div>
     </form>
   </div>
 </template>
 
 <style scoped>
+
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
   background-color: #f4f7f6;
-  min-height: 60vh; /* Чтобы форма была по центру экрана */
+  min-height: 100vh;
 }
-
 .auth-card {
   background: white;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.05);
   width: 100%;
-  max-width: 400px;
+  max-width: 350px;
 }
-
-h2 {
-  margin-bottom: 25px;
-  text-align: center;
-  color: #333;
-}
-
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
 }
-
-.input-group label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #666;
-}
-
 .input-group input {
-  padding: 12px;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.3s;
+  border-radius: 6px;
 }
-
-.input-group input:focus {
-  outline: none;
-  border-color: #f39200; /* Оранжевый Coffee Like */
-}
-
 .login-btn {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background-color: #f39200;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s;
 }
-
-.login-btn:hover:not(:disabled) {
-  background-color: #d68100;
-}
-
-.login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .error-msg {
   color: #e74c3c;
+  margin-bottom: 10px;
   font-size: 14px;
-  margin-bottom: 15px;
-  text-align: center;
 }
-
 .auth-footer {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  margin-top: 15px;
+  text-align: center;
   font-size: 13px;
-}
-
-.auth-footer a {
-  color: #f39200;
-  text-decoration: none;
 }
 </style>

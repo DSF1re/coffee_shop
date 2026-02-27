@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Простой массив ссылок
 const menuItems = [
   { name: 'О нас', url: '/about' },
   { name: 'Меню', url: '/menu' },

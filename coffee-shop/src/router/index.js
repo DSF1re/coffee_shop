@@ -1,6 +1,7 @@
 import Auth from '@/screens/auth.vue'
 import Catalog from '@/screens/catalog.vue'
 import Profile from '@/screens/profile.vue'
+import Register from '@/components/register.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -20,7 +21,12 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: Profile
-    }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: Register
+    },
   ],
 })
 
